@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>My Watchlist</title>
+</head>
+<body>
+<header>
+    <h1>Stock Watchlist Dashboard</h1>
+    <p sec:authorize="isAuthenticated()">
+        Welcome, <span sec:authentication="name">User Email</span>!
+    </p>
+    <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+        <input type="submit" value="Sign Out"/>
+    </form>
+</header>
+<hr/>
+
+<h2>My Stocks</h2>
+
+<div th:if="${watchlist.isEmpty()}">
+    <p>Your watchlist is currently empty. Start tracking some stocks!</p>
+</div>
+
+<table border="1" th:if="${!watchlist.isEmpty()}">
+    <thead>
+    <tr>
+        <th>Symbol</th>
+        <th>Name</th>
+        <th>Current Price</th>
+        <th>Target Price</th>
+        <th>Notes</th>
+        <th>Added Date</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${watchlist}">
+        <td th:text="${item.stock.symbol}">AAPL</td>
+        <td th:text="${item.stock.name}">Apple Inc.</td>
+        <td th:text="${#numbers.formatDecimal(item.stock.currentPrice, 0, 2)}">$0.00</td>
+        <td th:text="${#numbers.formatDecimal(item.targetPrice, 0, 2)}">$0.00</td>
+        <td th:text="${item.notes}">Goal notes</td>
+        <td th:text="${#temporals.format(item.addedDate, 'yyyy-MM-dd')}">2024-01-01</td>
+        <td>
+            <form th:action="@{'/watchlist/' + ${item.watchlistId} + '/delete'}" method="post">
+                <button type="submit">Remove</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<hr/>
+
+<h2>Add Stock to Watchlist</h2>
+<form th:action="@{/watchlist/add}" method="post">
+    <div>
+        <label for="stockId">Stock ID to Add:</label>
+        <input type="number" id="stockId" name="stockId" required>
+    </div>
+    <div>
+        <label for="targetPrice">Target Price:</label>
+        <input type="number" step="0.01" id="targetPrice" name="targetPrice">
+    </div>
+    <div>
+        <label for="notes">Notes:</label>
+        <textarea id="notes" name="notes"></textarea>
+    </div>
+    <button type="submit">Add to Watchlist</button>
+</form>
+
+<div th:if="${errorMessage}" style="color: red;">
+    Error: <span th:text="${errorMessage}"></span>
+</div>
+<div th:if="${successMessage}" style="color: green;">
+    <span th:text="${successMessage}"></span>
+</div>
+
+<hr/>
+<h3><a th:href="@{/reports}">View Performance Report</a></h3>
+
+</body>
+</html>

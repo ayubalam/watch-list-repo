@@ -3,14 +3,17 @@ package com.example.stockwatchlist.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails; // *** NEW IMPORT ***
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data // Generates getters, setters, toString, equals, and hashCode
-@NoArgsConstructor // Generates the required no-arg constructor
-public class User {
+@Data
+@NoArgsConstructor
+public class User implements UserDetails { // *** IMPLEMENT USERDETAILS ***
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +25,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false) // Added NOT NULL constraint here for security
+    @Column(nullable = false)
     private String password;
 
     private String contactNo;
@@ -33,4 +36,46 @@ public class User {
     // User can have multiple items in their watchlist (One-to-Many)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Watchlist> watchlists;
+
+    // ===========================================
+    // IMPLEMENTATION OF UserDetails INTERFACE
+    // ===========================================
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Simple implementation: grant a default "USER" role
+        return List.of(() -> "ROLE_USER");
+    }
+
+    @Override
+    public String getUsername() {
+        // CRUCIAL: Return the email, as this is the field used for login
+        return this.email;
+    }
+
+    @Override
+    public String getPassword() {
+        // Return the stored password hash
+        return this.password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Assuming accounts never expire
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Assuming accounts are never locked
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Assuming credentials never expire
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Assuming user is always enabled
+    }
 }
