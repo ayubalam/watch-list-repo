@@ -3,6 +3,7 @@ package com.example.stockwatchlist.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,10 +26,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for API testing (re-enable for production and Thymeleaf forms)
                 .authorizeHttpRequests(auth -> auth
                         // Allow POST to register a new user without authentication
-                        .requestMatchers("/api/users").permitAll()
+                        //.requestMatchers("/api/users").permitAll()
 
                         // Allow access to static resources and the login/home pages
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/").permitAll()
+                        .requestMatchers("/register", "/api/users", "/css/**", "/js/**", "/images/**", "/").permitAll()
 
                         // All other requests require authentication
                         .anyRequest().authenticated()

@@ -5,9 +5,10 @@ import com.example.stockwatchlist.service.StockService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal; // Ensure this import is present
 import java.util.List;
 
-@RestController // Use @RestController for pure API endpoints
+@RestController
 @RequestMapping("/api/stocks")
 public class StockController {
 
@@ -17,7 +18,7 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    // POST /api/stocks: Add new stock (Requires authentication as per SecurityConfig default)
+    // POST /api/stocks: Add new stock
     @PostMapping
     public ResponseEntity<?> addNewStock(@RequestBody Stock stock) {
         try {
@@ -28,7 +29,7 @@ public class StockController {
         }
     }
 
-    // GET /api/stocks: View all stocks (Requires authentication)
+    // GET /api/stocks: View all stocks
     @GetMapping
     public ResponseEntity<List<Stock>> getAllStocks() {
         return ResponseEntity.ok(stockService.findAllStocks());
@@ -39,15 +40,18 @@ public class StockController {
     public ResponseEntity<?> updateStockPrice(@PathVariable Long id, @RequestParam("newPrice") String newPriceString) {
         try {
             // Validate and parse the price string
-            java.math.BigDecimal newPrice = new java.math.BigDecimal(newPriceString);
+            BigDecimal newPrice = new BigDecimal(newPriceString);
             Stock updatedStock = stockService.updatePrice(id, newPrice);
             return ResponseEntity.ok(updatedStock);
+        } catch (NumberFormatException e) {
+            // Catches error if newPriceString is not a valid number
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid price format: Price must be a valid number.");
         } catch (IllegalArgumentException e) {
-            // Catches errors from StockService (stock not found)
+            // Catches errors from StockService (e.g., stock not found)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            // Catches NumberFormatException and any other unexpected exceptions
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid price format or unexpected error: " + e.getMessage());
+            // General fallback for any other unexpected error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
 }

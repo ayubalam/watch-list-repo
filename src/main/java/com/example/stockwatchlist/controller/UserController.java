@@ -76,4 +76,9 @@ public class UserController {
         // Note: For production, you should filter/mask sensitive data like contact_no or implement proper DTOs.
         return ResponseEntity.ok(userService.findAllUsers());
     }
+
+    @GetMapping("/login-simple")
+    public String loginSimple() {
+        return "login-simple";
+    }
 }

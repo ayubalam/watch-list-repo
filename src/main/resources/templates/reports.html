@@ -1,15 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Performance Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/css/custom.css">
+    <title>Stock Performance Report</title>
 </head>
 <body>
-<h1>Stock Performance Report</h1>
+<div class="main-container">
+    <div class="report-section">
+        <h1 class="text-center">Stock Performance Report</h1>
 
-<p>This page will show a detailed analysis of your watchlist performance.</p>
+        <div class="report-console">
+            <pre th:text="${reportOutput}" class="m-0"></pre>
+        </div>
 
-<hr/>
-<h3><a th:href="@{/watchlist}">Back to Watchlist</a></h3>
+        <div class="text-center">
+            <a href="/watchlist" class="button secondary large">Back to Watchlist</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>
